@@ -1,5 +1,5 @@
 <div class="ui-g">
-  <p-panel header="Gym Balance Sheet" class="ui-g-3 ui-g-nopad" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
+  <p-panel header="Gym Balance Sheet" class="ui-g-3" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
     <div class="ui-grid-row">
       <label class="ui-g-8">Total Amount Credited<span style="float:right">:</span></label>
       <label class="ui-g-4">{{totalCreditedAmount}}</label>
@@ -11,5 +11,18 @@
       <label class="ui-g-4">{{balanceAmount}}</label>
 
     </div>
+  </p-panel>
+
+  <p-panel header="Payment Form" class="ui-g-3" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
+    <div class="ui-grid-row">
+      <label class="ui-g-6">Paid To<span style="float:right">:</span></label>
+      <input type="text" class="form-control ui-g-6" pInputText required>
+    </div>
+    <div class="ui-grid-row">
+      <label class="ui-g-6">Amount<span style="float:right">:</span></label>
+      <input type="text" class="form-control ui-g-6" pInputText required>
+    </div>
+
+    <button pButton label="Submit" type="submit" ></button>
   </p-panel>
 </div>
