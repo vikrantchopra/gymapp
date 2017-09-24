@@ -1,0 +1,117 @@
+<form #addForm="ngForm" (ngSubmit)="addAccountInformation(addForm.value)">
+  <p-panel [style]="{'border-radius': '5px'}">
+    <p-header>
+      <div class="ui-helper-clearfix">
+        <span class="ui-panel-title" style="font-weight: bold">Gym Subscription</span>
+
+        <!--p-splitButton [style]="{'float':'right'}" label="Save" icon="fa-check" (onClick)="save()" [model]="items"></p-splitButton-->
+        <button pButton label="Add" type="submit" style="float: right; max-height: 25px; padding:0;" [disabled]="!addForm.form.valid"></button>
+        <span class="ui-panel-title" style="font-weight: bold; float:right; padding-right:38%">Emergency Details</span>
+      </div>
+    </p-header>
+
+    <div class="ui-g">
+
+      <p-panel styleClass="headerless" class="ui-g-6 ui-g-nopad" [style]="{'border-radius': '10px'}">
+        <div class="ui-grid-row">
+          <label class="ui-g-1">GymID</label>
+          <input type="text" [(ngModel)]="addAccount.gymid" name="gymid" #gymid="ngModel" class="form-control ui-g-2" pInputText required>
+
+          <label class="ui-g-2">Member Name</label>
+          <input type="text" [(ngModel)]="addAccount.employeeName" name="employeeName" #employeeName="ngModel" class="form-control ui-g-3"
+            pInputText required>
+
+          <label class="ui-g-1">Amount</label>
+          <p-selectButton [(ngModel)]="addAccount.amount" name="amount" #amount="ngModel" [options]="amountOptions" class="form-control ui-g-3 ui-g-nopad"
+            [style]="{'float': 'right'}"></p-selectButton>
+
+          <div class="ui-g-12"></div>
+
+          <label class="ui-g-1">Phone</label>
+          <input type="text" [(ngModel)]="addAccount.phone" name="phone" #phone="ngModel" class="form-control ui-g-2" pInputText required>
+
+          <label class="ui-g-2">Comments</label>
+          <input type="text" [(ngModel)]="addAccount.comments" name="comments" #comments="ngModel" class="form-control ui-g-7" pInputText
+            required>
+
+        </div>
+
+      </p-panel>
+
+      <p-panel styleClass="headerless" class="ui-g-6 ui-g-nopad" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
+        <div class="ui-grid-row">
+          <label class="ui-g-2">Local Contact</label>
+          <input type="text" [(ngModel)]="addAccount.localContact" name="localContact" #localContact="ngModel" class="form-control ui-g-4"
+            pInputText required>
+
+          <label class="ui-g-2">Home Contact</label>
+          <input type="text" [(ngModel)]="addAccount.homeContact" name="homeContact" #homeContact="ngModel" class="form-control ui-g-4"
+            pInputText required>
+
+          <div class="ui-g-12"></div>
+
+          <label class="ui-g-2">Doctor Details</label>
+          <input type="text" [(ngModel)]="addAccount.doctorDetails" name="doctorDetails" #doctorDetails="ngModel" class="form-control ui-g-4"
+            pInputText required>
+
+          <label class="ui-g-2">Ailments</label>
+          <input type="text" [(ngModel)]="addAccount.ailments" name="ailments" #ailments="ngModel" class="form-control ui-g-4" pInputText
+            required>
+
+        </div>
+      </p-panel>
+
+    </div>
+  </p-panel>
+</form>
+
+<div style="margin-top: 5px"></div>
+
+<p-dataTable #sdt [value]="subscriptionItems | async" dataKey="id" [style]="{'width': '', 'padding-left':''}">
+  <p-header>Subscription List</p-header>
+  <p-column field="GymId" header="Gym ID" [style]="{'width':'70px'}"></p-column>
+  <p-column field="Name" header="Name" [style]="{'width':'120px'}" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+  <p-column field="Validity" header="Validity" sortable="true" [style]="{'width':'90px'}">
+    <ng-template let-col let-date="rowData" pTemplate="body">
+      <span>{{date[col.field] | date:'MMM  y'}}</span>
+    </ng-template>
+  </p-column>
+  <p-column field="Status" header="Status" [style]="{'width':'80px'}" [filter]="true" filterPlaceholder="Search">
+    <ng-template let-col let-state="rowData" pTemplate="body">
+      <span [style.color]="state[col.field]==='ACTIVE'?'green':'red'">{{state[col.field]}}</span>
+    </ng-template>
+  </p-column>
+  <p-column field="Comments" header="Comments" [style]="{'width':'160px'}"></p-column>
+</p-dataTable>
+
+<div style="margin-top: 15px"></div>
+
+<div class="ui-g">
+<p-dataTable #tdt [value]="transactionItems | async" dataKey="id" [style]="{'width': '', 'padding-left':''}" class="ui-g-9 ui-g-nopad">
+  <p-header>Transaction List</p-header>
+  <p-column field="Name" header="Name" [style]="{'width':'120px'}" [sortable]="true"></p-column>
+  <p-column field="Type" header="Type" [style]="{'width':'160px'}"></p-column>
+  <p-column field="Amount" header="Amount" [style]="{'width':'160px'}"></p-column>
+  <p-column field="PaymentDate" header="Payment Date" sortable="true" [style]="{'width':'110px'}">
+    <ng-template let-col let-date="rowData" pTemplate="body">
+      <span>{{date[col.field] | date}}</span>
+    </ng-template>
+  </p-column>
+</p-dataTable>
+
+<p-panel header="Subscription Details" class="ui-g-3 ui-g-nopad" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
+    <div class="ui-grid-row">
+        <label class="ui-g-8">Total Members <span style="float:right">:</span></label>
+        <label class="ui-g-4">{{count}}</label>
+
+        <label class="ui-g-8">Monthly Subscriptions <span style="float:right">:</span></label>
+        <label class="ui-g-4">{{monthlyCount}}</label>
+
+        <label class="ui-g-8">Quarterly Subscriptions <span style="float:right">:</span></label>
+        <label class="ui-g-4">{{quarterlyCount}}</label>
+
+        <label class="ui-g-8">Active Members <span style="float:right">:</span></label>
+        <label class="ui-g-4">{{activeCount}}</label>
+    </div>
+</p-panel>
+</div>

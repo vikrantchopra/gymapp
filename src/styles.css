@@ -1,1 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~primeng/resources/themes/voclain/theme.css';
+
+body {
+    font-size: small;
+}
+
+/*.ui-helper-clearfix {
+    max-height: 40px;
+}*/
+
+.headerless .ui-panel-titlebar {
+    display: none !important;
+}
+
+
+.padding-none {
+    padding: 0 !important;
+}
+
+.ui-datatable-header .ui-datatable .ui-datatable-thead > tr > th {
+    background: red;
+    font-size: large;
+}
+
+.redheader th.redheader {
+    background: #8B4E6D;
+}
