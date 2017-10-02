@@ -7,15 +7,13 @@ import { HorizonService } from './services/horizon.service';
 import { AppComponent } from './app.component';
 import { AccountManagementComponent } from './components/account-management/account-management.component';
 
-import {TabViewModule, DataTableModule, PanelModule, ButtonModule, InputTextModule, SelectButtonModule} from 'primeng/primeng';
-//import { TransactionDetailsComponent } from './components/transaction-details/transaction-details.component';
+import {ChartModule, CalendarModule, DialogModule, OverlayPanelModule, AutoCompleteModule,TabViewModule, DataTableModule, PanelModule, ButtonModule, InputTextModule, SelectButtonModule} from 'primeng/primeng';
 import { TransactionDetailsComponent } from './components/transaction-details/transaction-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AccountManagementComponent,
-    //TrasactionDetailsComponent,
     TransactionDetailsComponent
   ],
   imports: [
@@ -27,7 +25,12 @@ import { TransactionDetailsComponent } from './components/transaction-details/tr
     InputTextModule,
     SelectButtonModule,
     DataTableModule, 
-    TabViewModule
+    TabViewModule,
+    AutoCompleteModule,
+    OverlayPanelModule,
+    DialogModule,
+    CalendarModule,
+    ChartModule
   ],
   providers: [HorizonService],
   bootstrap: [AppComponent]

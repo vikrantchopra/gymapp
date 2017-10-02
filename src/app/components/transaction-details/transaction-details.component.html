@@ -1,28 +1,123 @@
 <div class="ui-g">
-  <p-panel header="Gym Balance Sheet" class="ui-g-3" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
+  <p-panel header="Gym Balance Sheet" class="ui-g-2 ui-g-nopad" [style]="{'margin-left':'0px', 'border-radius': '5px','font-size':'125%'}">
     <div class="ui-grid-row">
-      <label class="ui-g-8">Total Amount Credited<span style="float:right">:</span></label>
-      <label class="ui-g-4">{{totalCreditedAmount}}</label>
+      <label class="ui-g-9">Total Deposits<span style="float:right">:</span></label>
+      <label class="ui-g-3">{{totalCreditedAmount}}</label>
 
-      <label class="ui-g-8">Total Amount Debited<span style="float:right">:</span></label>
-      <label class="ui-g-4">{{totalDebitedAmount}}</label>
+      <label class="ui-g-9">Total Withdrawals<span style="float:right">:</span></label>
+      <label class="ui-g-3">{{totalDebitedAmount}}</label>
 
-      <label class="ui-g-8">Balance Amount <span style="float:right">:</span></label>
-      <label class="ui-g-4">{{balanceAmount}}</label>
+      <div class="ui-g-12 ui-g-nopad"><hr/></div>
+      <label class="ui-g-9">Balance Amount<span style="float:right">:</span></label>
+      <label class="ui-g-3">{{balanceAmount}}</label>
 
     </div>
   </p-panel>
 
-  <p-panel header="Payment Form" class="ui-g-3" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
-    <div class="ui-grid-row">
-      <label class="ui-g-6">Paid To<span style="float:right">:</span></label>
-      <input type="text" class="form-control ui-g-6" pInputText required>
-    </div>
-    <div class="ui-grid-row">
-      <label class="ui-g-6">Amount<span style="float:right">:</span></label>
-      <input type="text" class="form-control ui-g-6" pInputText required>
-    </div>
 
-    <button pButton label="Submit" type="submit" ></button>
+  <p-panel header="Payment Form" class="ui-g-3 ui-g-nopad" [style]="{'margin-left':'5px', 'border-radius': '5px','font-size':'115%'}">
+    <form #addForm="ngForm" (ngSubmit)="addTransaction(addForm.value)">
+      <div class="ui-grid-row">
+        <label class="ui-g-5">Paid To<span style="float:right">:</span></label>
+        <input type="text" class="form-control ui-g-7" pInputText required [(ngModel)]="addTrans.employeeName" name="employeeName"
+          #employeeName="ngModel">
+      </div>
+      <div class="ui-grid-row">
+        <label class="ui-g-5">Amount<span style="float:right">:</span></label>
+        <input type="text" class="form-control ui-g-7" pInputText required [(ngModel)]="addTrans.amount" name="amount" #amount="ngModel">
+      </div>
+      <div class="ui-grid-row">
+        <label class="ui-g-5">Payment Date<span style="float:right">:</span></label>
+        <p-calendar class="form-control ui-g-7 ui-g-nopad" [showIcon]="true" [(ngModel)]="addTrans.paymentDate" name="paymentDate"
+          #paymentDate="ngModel">
+          <ng-template pTemplate="date" let-date>
+            <span [ngStyle]="{backgroundColor:  'white'}" style="border-radius:50%">
+             {{date.day}}</span>
+          </ng-template>
+        </p-calendar>
+      </div>
+
+      <button pButton label="Submit" type="submit"style="margin-top: 5px"></button>
+    </form>
   </p-panel>
+
+  <p-dataTable #dt [value]="last5Transactions | async" dataKey="id" [style]="{'font-size':'110%'}" class="ui-g-4">
+    <p-header>Last 5 Transactions</p-header>
+    <p-column field="Name" header="Name" [sortable]="true"></p-column>
+    <p-column field="Type" header="Type" ></p-column>
+    <p-column field="Amount" header="Amount" ></p-column>
+    <p-column field="PaymentDate" header="Payment Date" >
+      <ng-template let-col let-date="rowData" pTemplate="body">
+        <span>{{date[col.field] | date}}</span>
+      </ng-template>
+    </p-column>
+  </p-dataTable>
+
+
+  <p-panel header="Last Transaction Details" class="ui-g-3 ui-g-nopad" [style]="{'margin-left':'5px', 'border-radius': '5px','font-size':'115%'}">
+    <div class="ui-grid-row">
+      <label class="ui-g-7">Transaction Type<span style="float:right">:</span></label>
+      <label class="ui-g-5">{{transactionType}}</label>
+
+      <label class="ui-g-7">Transaction Amount<span style="float:right">:</span></label>
+      <label class="ui-g-5">{{latestTransaction.amount}}</label>
+
+      <label class="ui-g-7">Transactor Name<span style="float:right">:</span></label>
+      <label class="ui-g-5">{{latestTransaction.employeeName}}</label>
+
+      <label class="ui-g-7">Transaction Date<span style="float:right">:</span></label>
+      <label class="ui-g-5">{{latestTransaction.paymentDate | date}}</label>
+
+    </div>
+  </p-panel>
+</div>
+
+<div style="margin-top: 25px"></div>
+
+<div class="ui-g">
+  <p-panel header="Individual Payment Details" class="ui-g-4 ui-g-nopad" [style]="{'font-size':'105%'}">
+    <div class="ui-grid-row">
+      <label class="ui-g-4">Payment Details For</label>
+      <p-autoComplete [(ngModel)]="nameText" [suggestions]="nameResults" (completeMethod)="filterSingleName($event)" (onSelect)="setSelectedName()"
+        (onClear)="clearName($event)" [size]="40"></p-autoComplete>
+
+
+      <div class="ui-g-12" *ngIf="selectedName">
+
+        <div class="ui-grid-row">
+          <div class="ui-g-4 ui-g-nopad"><label>Amount<span style="float:right; margin-right:5px">: </span></label></div>
+          <div class="ui-g-8 ui-g-nopad"><label>{{selectedTransaction.amount}}</label></div>
+
+          <div style="margin-top: 2px" class="ui-g-12"></div>
+
+          <div class="ui-g-4 ui-g-nopad"><label>Payment Date<span style="float:right; margin-right:5px">:</span></label></div>
+          <div class="ui-g-8 ui-g-nopad"><label>{{selectedTransaction.paymentDate | date}}</label></div>
+
+          <div style="margin-top: 2px" class="ui-g-12"></div>
+
+          <div class="ui-g-4 ui-g-nopad"><label>Transaction Type<span style="float:right; margin-right:5px">:</span></label></div>
+          <div class="ui-g-8 ui-g-nopad"><label>{{selectedType}}</label></div>
+        </div>
+
+        <div style="margin-top: 5px"></div>
+
+        <p-dataTable #tdt [value]="selectedTransactionItems | async" dataKey="id" [style]="{'width': '', 'padding-left':''}">
+          <p-header>Last 5 Transactions</p-header>
+          <!--p-column field="Name" header="Name" [style]="{'width':'120px'}" [sortable]="true"></p-column-->
+          <p-column field="Type" header="Type" [style]="{'width':'160px'}"></p-column>
+          <p-column field="Amount" header="Amount" [style]="{'width':'160px'}"></p-column>
+          <p-column field="PaymentDate" header="Payment Date" [style]="{'width':'110px'}">
+            <ng-template let-col let-date="rowData" pTemplate="body">
+              <span>{{date[col.field] | date}}</span>
+            </ng-template>
+          </p-column>
+        </p-dataTable>
+
+      </div>
+
+    </div>
+  </p-panel>
+
+  <p-chart type="doughnut" [data]="data" class="ui-g-4"></p-chart>
+
 </div>

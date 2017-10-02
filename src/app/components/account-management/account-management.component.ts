@@ -3,7 +3,8 @@ import { SelectItem } from 'primeng/primeng';
 import { UtilService } from '../../services/util.service';
 import { AccountingService } from '../../services/accounting.service';
 
-import { Account } from '../../models';
+import { Account, Subscription } from '../../models';
+import { OverlayPanel } from 'primeng/primeng';
 
 @Component({
   selector: 'app-account-management',
@@ -17,6 +18,12 @@ export class AccountManagementComponent implements OnInit {
   transactionItems: any;
   addAccount: Account;
 
+  editSubscription: Subscription;
+  displayEditDialog:boolean;
+
+  selectedRecord: any;
+  displayEmergencyDialog: boolean;
+
   amountOptions: SelectItem[];
   statusOptions: SelectItem[];
 
@@ -24,7 +31,12 @@ export class AccountManagementComponent implements OnInit {
   monthlyCount:number;
   quarterlyCount:number;
   activeCount:number;
-  diff:number;
+  inactiveCount: number;
+
+  selectedRecords: any[];
+
+  subscriptionData: any;
+  statusData: any;
 
   constructor(private utilService: UtilService, private accountingService: AccountingService) {
     this.amountOptions = utilService.getAmountValues();
@@ -34,13 +46,15 @@ export class AccountManagementComponent implements OnInit {
   ngOnInit() {
     this.loadAccountInformation();
     this.addAccount = this.initializeAccount();
+    this.editSubscription = this.initializeAccount();
 
     this.getMemberCount();
     this.getMonthlySubscriptions();
     this.getQuarterlySubscriptions();
     this.getActiveSubscriptions();
 
-    //this.getDiff();
+    this.getSubscriptionChartData();
+    this.getStatusChartData();
   }
 
   loadAccountInformation() {
@@ -57,6 +71,7 @@ export class AccountManagementComponent implements OnInit {
       startDate: null,
       status: 'ACTIVE',
       comments: '',
+      type: '',
       phone: '',
       localContact: '',
       homeContact: '',
@@ -66,9 +81,24 @@ export class AccountManagementComponent implements OnInit {
     return acc;
   }
 
-  addAccountInformation(model: Account) {
+  addAccountInformation(model: any) {
+    model.type = "Credit";
     this.accountingService.save(model);
     this.addAccount = this.initializeAccount();
+  }
+
+  selectEmergencyDetails(emergencyDetails: any) {
+    this.selectedRecord = emergencyDetails;
+    this.displayEmergencyDialog = true;
+  }
+
+  selectPersonalDetails(event, personalDetails: any, overlayPanel: OverlayPanel) {
+    this.selectedRecord = personalDetails;
+    overlayPanel.toggle(event);
+  }
+
+  onDialogHide() {
+    this.selectedRecord = null;
   }
 
   getMemberCount() {
@@ -86,16 +116,111 @@ export class AccountManagementComponent implements OnInit {
   getQuarterlySubscriptions() {
     this.accountingService.getQuarterlySubscriptions().subscribe(items => {
       this.quarterlyCount = items.length;
-    })
+    });
+  }
+
+  getSubscriptionChartData() {
+    this.accountingService.getMonthlySubscriptions().subscribe(items => {
+      this.monthlyCount = items.length;
+
+      this.accountingService.getQuarterlySubscriptions().subscribe(items => {
+        this.quarterlyCount = items.length;
+
+        this.subscrtiptionChart(this.monthlyCount, this.quarterlyCount);
+      });
+    }); 
+  }
+
+  subscrtiptionChart(monthlyNumber: number, quarterlyNumber: number){
+    this.subscriptionData = {
+      labels: ['Monthly Members','Quarterly Members'],
+      datasets: [
+          {
+              data: [monthlyNumber, quarterlyNumber],
+              backgroundColor: [
+                  "#FF6384",
+                  "#36A2EB"
+              ],
+              hoverBackgroundColor: [
+                  "#FF6384",
+                  "#36A2EB"
+              ]
+          }]    
+      };
   }
 
   getActiveSubscriptions() {
     this.accountingService.getActiveSubscriptions().subscribe(items => {
       this.activeCount = items.length;
-    })
+    });
   }
 
-  getDiff() {
+  getInactiveSubscriptions() {
+    this.accountingService.getInactiveSubscriptions().subscribe(items => {
+      this.inactiveCount = items.length;
+    });
+  }
+
+  statusChart(active: number, inactive: number) {
+    this.statusData = {
+      labels: ['Active','Inactive'],
+      datasets: [
+          {
+              data: [active, inactive],
+              backgroundColor: [
+                  "#4BC0C0",
+                  "#FFCE56"
+              ],
+              hoverBackgroundColor: [
+                  "#4BC0C0",
+                  "#FFCE56"
+              ]
+          }]    
+      };
+  }
+
+  getStatusChartData(){
+    this.accountingService.getActiveSubscriptions().subscribe(items => {
+      this.activeCount = items.length;
+
+      this.accountingService.getInactiveSubscriptions().subscribe(items => {
+        this.inactiveCount = items.length;
+
+        this.statusChart(this.activeCount, this.inactiveCount);
+      });
+    }); 
+  }
+
+  onEditRow(item: any) {
+    this.editSubscription = this.cloneSubscripition(item);
+    this.displayEditDialog = true;
+  }
+
+  cloneSubscripition(item: any) {
+    let acc = {
+      id: item.id,
+      gymid: item.GymId,
+      employeeName: item.Name,
+      amount: item.Amount,
+      startDate: item.StartDate,
+      status: item.Status,
+      comments: item.Comments,
+      phone: item.Phone,
+      localContact: item.LocalContact,
+      homeContact: item.HomeContact,
+      doctorDetails: item.DoctorDetails,
+      ailments: item.Ailments
+    };
+    return acc;
+  }
+
+  updateSubscription(model: Subscription) {
+    this.accountingService.update(model);
+    this.displayEditDialog = false;
+    this.editSubscription = this.initializeAccount();
+  }
+
+  /*getDiff() {
     this.accountingService.getSubscriptions().subscribe(items => {
       this.count = items.length; 
 
@@ -103,7 +228,7 @@ export class AccountManagementComponent implements OnInit {
         this.monthlyCount = items.length;
       }); this.diff = this.count - this.monthlyCount; console.log("Diff: " + this.diff);
     });
-  }
+  }*/
 
   
 }

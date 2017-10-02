@@ -26,3 +26,20 @@ body {
 .redheader th.redheader {
     background: #8B4E6D;
 }
+
+.centered {
+	position: fixed;
+	top: 0%;
+	left: 0%;
+	transform: translate(-100%, -100%);
+}
+
+.ui-chkbox .ui-chkbox-box {
+    color: white;
+}
+
+.editPanel .ui-panel-titlebar {
+    display: none !important;
+}
+
+

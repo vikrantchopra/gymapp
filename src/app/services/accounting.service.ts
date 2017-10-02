@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HorizonService } from './horizon.service';
 
-import { Account } from '../models';
+import { Account, Subscription } from '../models';
 
 const MONTHLY_AMOUNT: Number = 1000;
 const QUARTERLY_AMOUNT: Number = 2700;
@@ -28,8 +28,19 @@ export class AccountingService {
     .watch();
   }
 
+  getOnlyFive() {
+    return this.transactionTable
+    .order('PaymentDate', 'descending')
+    .limit(5)
+    .watch();
+  }
+
   save(model: Account) {
-    //model.startDate = new Date();
+    this.saveSubscription(model);
+    this.saveTransaction(model);
+  }
+
+  saveSubscription(model: Account) {
     this.subscriptionTable.store({
       id: model.id,
       GymId: model.gymid,
@@ -47,12 +58,29 @@ export class AccountingService {
       DoctorDetails: model.doctorDetails,
       Ailments: model.ailments
     });
+  }
 
+  saveTransaction(model: Account) {
     this.transactionTable.store({
       Name: model.employeeName,
-      Type: "Credit",
-      Amount: model.amount,
+      Type: model.type,
+      Amount: model.amount, //check if the amount should be assigned as +model.amount
       PaymentDate: new Date()
+    });
+  }
+
+  update(model: Subscription) {
+    this.subscriptionTable.update({
+      id: model.id,
+      Name: model.employeeName,
+      Phone: model.phone,
+      Email: this.generateEmail(model.employeeName),
+      Status: model.status,
+      Comments: model.comments,
+      LocalContact: model.localContact,
+      HomeContact: model.homeContact,
+      DoctorDetails: model.doctorDetails,
+      Ailments: model.ailments
     });
   }
 
@@ -83,6 +111,10 @@ export class AccountingService {
     return this.subscriptionTable.findAll({Status: "ACTIVE"}).watch();
   }
 
+  getInactiveSubscriptions() {
+    return this.subscriptionTable.findAll({Status: "INACTIVE"}).watch();
+  }
+
   totalCredits() {
     return this.transactionTable.findAll({Type: "Credit"}).watch();
   }
@@ -91,4 +123,15 @@ export class AccountingService {
     return this.transactionTable.findAll({Type: "Debit"}).watch();
   }
 
+  getSelectedRecord(name:string) {console.log("Selected Name::" + name);
+    return this.transactionTable.find({Name: name}).fetch();
+  }
+
+  getSelectedRecords(name: string) {
+    return this.transactionTable.findAll({Name: name}).fetch();
+  }
+
 }
+
+// get the first message from Bob
+//messages.find({from: "bob"}).fetch().subscribe(msg => console.log(msg));

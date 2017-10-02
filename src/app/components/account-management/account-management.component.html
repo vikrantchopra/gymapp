@@ -5,7 +5,8 @@
         <span class="ui-panel-title" style="font-weight: bold">Gym Subscription</span>
 
         <!--p-splitButton [style]="{'float':'right'}" label="Save" icon="fa-check" (onClick)="save()" [model]="items"></p-splitButton-->
-        <button pButton label="Add" type="submit" style="float: right; max-height: 25px; padding:0;" [disabled]="!addForm.form.valid"></button>
+        <button pButton label="Add" type="submit" style="float: right; max-height: 25px; padding:0;" [disabled]="!addForm.form.valid"
+          class="ui-button-warning"></button>
         <span class="ui-panel-title" style="font-weight: bold; float:right; padding-right:38%">Emergency Details</span>
       </div>
     </p-header>
@@ -67,51 +68,206 @@
 
 <div style="margin-top: 5px"></div>
 
-<p-dataTable #sdt [value]="subscriptionItems | async" dataKey="id" [style]="{'width': '', 'padding-left':''}">
-  <p-header>Subscription List</p-header>
-  <p-column field="GymId" header="Gym ID" [style]="{'width':'70px'}"></p-column>
-  <p-column field="Name" header="Name" [style]="{'width':'120px'}" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
-  <p-column field="Validity" header="Validity" sortable="true" [style]="{'width':'90px'}">
-    <ng-template let-col let-date="rowData" pTemplate="body">
-      <span>{{date[col.field] | date:'MMM  y'}}</span>
-    </ng-template>
-  </p-column>
-  <p-column field="Status" header="Status" [style]="{'width':'80px'}" [filter]="true" filterPlaceholder="Search">
-    <ng-template let-col let-state="rowData" pTemplate="body">
-      <span [style.color]="state[col.field]==='ACTIVE'?'green':'red'">{{state[col.field]}}</span>
-    </ng-template>
-  </p-column>
-  <p-column field="Comments" header="Comments" [style]="{'width':'160px'}"></p-column>
-</p-dataTable>
 
-<div style="margin-top: 15px"></div>
 
 <div class="ui-g">
-<p-dataTable #tdt [value]="transactionItems | async" dataKey="id" [style]="{'width': '', 'padding-left':''}" class="ui-g-9 ui-g-nopad">
-  <p-header>Transaction List</p-header>
-  <p-column field="Name" header="Name" [style]="{'width':'120px'}" [sortable]="true"></p-column>
-  <p-column field="Type" header="Type" [style]="{'width':'160px'}"></p-column>
-  <p-column field="Amount" header="Amount" [style]="{'width':'160px'}"></p-column>
-  <p-column field="PaymentDate" header="Payment Date" sortable="true" [style]="{'width':'110px'}">
-    <ng-template let-col let-date="rowData" pTemplate="body">
-      <span>{{date[col.field] | date}}</span>
-    </ng-template>
-  </p-column>
-</p-dataTable>
+  <div class="ui-g-3 ui-g-nopad">
+    <p-panel header="Subscription Details" class="ui-g-12 ui-g-nopad" [style]="{'border-radius': '10px', 'font-size':'135%'}">
+      <div class="ui-grid-row">
+        <label class="ui-g-9">Total Members <span style="float:right">:</span></label>
+        <label class="ui-g-3">{{count}}</label>
 
-<p-panel header="Subscription Details" class="ui-g-3 ui-g-nopad" [style]="{'margin-left':'5px', 'border-radius': '10px'}">
-    <div class="ui-grid-row">
-        <label class="ui-g-8">Total Members <span style="float:right">:</span></label>
-        <label class="ui-g-4">{{count}}</label>
+        <label class="ui-g-9">Monthly Subscriptions <span style="float:right">:</span></label>
+        <label class="ui-g-3">{{monthlyCount}}</label>
 
-        <label class="ui-g-8">Monthly Subscriptions <span style="float:right">:</span></label>
-        <label class="ui-g-4">{{monthlyCount}}</label>
+        <label class="ui-g-9">Quarterly Subscriptions <span style="float:right">:</span></label>
+        <label class="ui-g-3">{{quarterlyCount}}</label>
 
-        <label class="ui-g-8">Quarterly Subscriptions <span style="float:right">:</span></label>
-        <label class="ui-g-4">{{quarterlyCount}}</label>
+        <label class="ui-g-9">Active Members <span style="float:right">:</span></label>
+        <label class="ui-g-3">{{activeCount}}</label>
+      </div>
+    </p-panel>
 
-        <label class="ui-g-8">Active Members <span style="float:right">:</span></label>
-        <label class="ui-g-4">{{activeCount}}</label>
-    </div>
-</p-panel>
+    <p-panel header="Subscription Chart" class="ui-g-12 ui-g-nopad">
+      <p-chart type="pie" [data]="subscriptionData"></p-chart>
+    </p-panel>
+
+    <p-panel header="Status Chart" class="ui-g-12 ui-g-nopad">
+      <p-chart type="pie" [data]="statusData"></p-chart>
+    </p-panel>
+  </div>
+  <div class="ui-g-9">
+    <p-dataTable #sdt [value]="subscriptionItems | async" dataKey="id" [style]="{'width': '', 'padding-left':''}" [rows]="5"
+      [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]" [(selection)]="selectedRecords" class="ui-g-12 ui-g-nopad">
+      <p-header>Subscription List</p-header>
+      <p-column [style]="{'width':'20px', 'background-color':'white'}" selectionMode="multiple"></p-column>
+      <p-column field="GymId" header="Gym ID" [style]="{'width':'50px'}"></p-column>
+      <p-column field="Name" header="Name" [style]="{'width':'110px'}" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+      <p-column field="Validity" header="Validity" sortable="true" [style]="{'width':'70px'}">
+        <ng-template let-col let-date="rowData" pTemplate="body">
+          <span>{{date[col.field] | date:'MMM  y'}}</span>
+        </ng-template>
+      </p-column>
+      <p-column field="Status" header="Status" [style]="{'width':'80px'}" [filter]="true" filterPlaceholder="Search">
+        <ng-template let-col let-state="rowData" pTemplate="body">
+          <span [style.color]="state[col.field]==='ACTIVE'?'green':'red'">{{state[col.field]}}</span>
+        </ng-template>
+      </p-column>
+      <p-column field="Comments" header="Comments" [style]="{'width':'160px'}"></p-column>
+
+      <p-column styleClass="col-button" [style]="{'text-align':'center', 'width':'110px'}" header="Personal/Emergency Details">
+        <ng-template let-item="rowData" pTemplate="body">
+          <button type="button" pButton class="ui-button-info" icon="fa-user-circle" (mouseenter)="selectPersonalDetails($event, item, op);"></button>
+          <button type="button" pButton (click)="selectEmergencyDetails(item)" icon="fa-ambulance"></button>
+        </ng-template>
+      </p-column>
+
+      <p-column styleClass="col-button" [style]="{'text-align':'center', 'width':'110px'}" header="Edit Details">
+        <ng-template let-item="rowData" pTemplate="body">
+          <button type="button" pButton class="ui-button-info" (click)="onEditRow(item)" icon="fa-edit"></button>
+        </ng-template>
+      </p-column>
+      <p-footer *ngIf="selectedRecords != 0">
+        <ul>
+          <li *ngFor="let record of selectedRecords" style="list-style:none; text-align:left">{{record.Email}};</li>
+        </ul>
+      </p-footer>
+    </p-dataTable>
+
+    <div style="margin-top: 25px" class="ui-g-12 ui-g-nopad"></div>
+
+    <p-dataTable #tdt [value]="transactionItems | async" dataKey="id" [style]="{'width': '', 'padding-left':''}" class="ui-g-12 ui-g-nopad"
+      [rows]="5" [paginator]="true" [pageLinks]="3" [rowsPerPageOptions]="[5,10,20]">
+      <p-header>Transaction List</p-header>
+      <p-column field="Name" header="Name" [style]="{'width':'120px'}" [sortable]="true" [filter]="true" filterPlaceholder="Search"></p-column>
+      <p-column field="Type" header="Type" [style]="{'width':'160px'}" [filter]="true" filterPlaceholder="Search"></p-column>
+      <p-column field="Amount" header="Amount" [style]="{'width':'160px'}"></p-column>
+      <p-column field="PaymentDate" header="Payment Date" sortable="true" [style]="{'width':'110px'}">
+        <ng-template let-col let-date="rowData" pTemplate="body">
+          <span>{{date[col.field] | date}}</span>
+        </ng-template>
+      </p-column>
+    </p-dataTable>
+  </div>
+
 </div>
+
+<p-overlayPanel #op (onAfterHide)="onDialogHide()" styleClass="ui-grid ui-grid-responsive ui-grid-pad centered">
+  <div class="ui-grid ui-grid-responsive ui-grid-pad" *ngIf="selectedRecord" style="font-size:16px; min-width:350px; align-content:center">
+    <div class="ui-grid-col-12 ui-grid-nopad" style="background: #b9c9c6; text-align:center">
+      <h3>{{selectedRecord.Name}}</h3>
+    </div>
+    <div class="ui-grid-col-12" style="background: #b9c9c6; text-align:center">
+      {{selectedRecord.Email}}
+    </div>
+
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4" style="text-align:left">Amount Paid </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:#1976D2">{{selectedRecord.Amount}}</div>
+    </div>
+
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4" style="text-align:left">Phone </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:#1976D2">{{selectedRecord.Phone}}</div>
+    </div>
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4" style="text-align:left">Start Date </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:#1976D2">{{selectedRecord.StartDate | date}}</div>
+    </div>
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4" style="text-align:left">Membership </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:#1976D2">{{selectedRecord.Type}}</div>
+    </div>
+  </div>
+</p-overlayPanel>
+
+<p-dialog header="Emergency Details" [(visible)]="displayEmergencyDialog" [responsive]="true" showEffect="fade" [modal]="true"
+  width="500" (onAfterHide)="onDialogHide()" [style]="{'border-radius': '10', 'background': 'lightgrey'}">
+  <div class="ui-grid ui-grid-responsive ui-grid-pad" *ngIf="selectedRecord" style="font-size:16px;text-align:left;padding:20px">
+    <div class="ui-grid-col-12 ui-grid-nopad" style="text-align:center">
+      <h3>{{selectedRecord.Name}}</h3>
+    </div>
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4">Local Contact </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:blue">{{selectedRecord.LocalContact}}</div>
+    </div>
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4">Home Contact </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:blue">{{selectedRecord.HomeContact}}</div>
+    </div>
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4">Doctor Details </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:blue">{{selectedRecord.DoctorDetails}}</div>
+    </div>
+    <div class="ui-grid-row">
+      <div class="ui-grid-col-4">Ailments </div><span style="text-align:right">:</span>
+      <div class="ui-grid-col-8" style="color:blue">{{selectedRecord.Ailments}}</div>
+    </div>
+  </div>
+
+</p-dialog>
+
+
+<p-dialog header="Edit Subscription" [(visible)]="displayEditDialog" [responsive]="true" showEffect="fade" [modal]="true"
+  [width]="670">
+  <form #editForm="ngForm" (ngSubmit)="updateSubscription(editForm.value)">
+    <div class="ui-g">
+      <div class="ui-grid-row" style="display: none">
+        <input type="text" [(ngModel)]="editSubscription.id" name="id" #id="ngModel" class="form-control ui-grid-col-8" pInputText>
+      </div>
+      <p-panel [style]="{'margin-bottom':'20px'}" styleClass="editPanel" class="ui-g-6">
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-3">Name</label>
+          <input type="text" [(ngModel)]="editSubscription.employeeName" name="employeeName" #employeeName="ngModel" class="form-control ui-grid-col-9"
+            pInputText>
+        </div>
+        <div class="ui-g-12"></div>
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-3">Phone</label>
+          <input type="text" [(ngModel)]="editSubscription.phone" name="phone" #phone="ngModel" class="form-control ui-grid-col-9"
+            pInputText>
+        </div>
+        <div class="ui-g-12"></div>
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-3">Status</label>
+          <p-selectButton [options]="statusOptions" [(ngModel)]="editSubscription.status" name="status" #status="ngModel" class="form-control ui-grid-col-9 ui-g-nopad"></p-selectButton>
+        </div>
+        <div class="ui-g-12"></div>
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-3">Comments</label>
+          <input type="text" [(ngModel)]="editSubscription.comments" name="comments" #comments="ngModel" class="form-control ui-grid-col-9"
+            pInputText>
+        </div>
+      </p-panel>
+
+      <p-panel [style]="{'margin-bottom':'20px'}" styleClass="editPanel" class="ui-g-6">
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-4">Local Contact</label>
+          <input type="text" [(ngModel)]="editSubscription.localContact" name="localContact" #localContact="ngModel" class="form-control ui-grid-col-8"
+            pInputText>
+        </div>
+        <div class="ui-g-12"></div>
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-4">Home Contact</label>
+          <input type="text" [(ngModel)]="editSubscription.homeContact" name="homeContact" #homeContact="ngModel" class="form-control ui-grid-col-8"
+            pInputText>
+        </div>
+        <div class="ui-g-12"></div>
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-4">Doctor Details</label>
+          <input type="text" [(ngModel)]="editSubscription.doctorDetails" name="doctorDetails" #doctorDetails="ngModel" class="form-control ui-grid-col-8"
+            pInputText>
+        </div>
+        <div class="ui-g-12"></div>
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-4">Ailments</label>
+          <input type="text" [(ngModel)]="editSubscription.ailments" name="ailments" #ailments="ngModel" class="form-control ui-grid-col-8"
+            pInputText>
+        </div>
+
+      </p-panel>
+      <button pButton label="Submit" type="submit" style="margin-left: 5px; margin-top:-20px"></button>
+    </div>
+
+  </form>
+</p-dialog>

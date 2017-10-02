@@ -7,6 +7,7 @@ export interface Account {
     status: string,
     comments: string,
     phone: string,
+    type: string,
     localContact: string,
     homeContact: string,
     doctorDetails: string,

@@ -24,6 +24,7 @@
     "@angular/platform-server": "^4.3.6",
     "@angular/router": "^4.3.6",
     "@types/node": "^6.0.88",
+    "chart.js": "^2.7.0",
     "core-js": "^2.4.1",
     "font-awesome": "^4.7.0",
     "horizon": "^2.0.0",
