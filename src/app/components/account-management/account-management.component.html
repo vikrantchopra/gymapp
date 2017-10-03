@@ -122,11 +122,19 @@
         </ng-template>
       </p-column>
 
-      <p-column styleClass="col-button" [style]="{'text-align':'center', 'width':'110px'}" header="Edit Details">
+      <p-column styleClass="col-button" [style]="{'text-align':'center', 'width':'100px'}" header="Edit Details">
         <ng-template let-item="rowData" pTemplate="body">
           <button type="button" pButton class="ui-button-info" (click)="onEditRow(item)" icon="fa-edit"></button>
         </ng-template>
       </p-column>
+
+      <p-column styleClass="col-button" [style]="{'text-align':'center', 'width':'100px'}" header="Renew Membership">
+        <ng-template let-item="rowData" pTemplate="body">
+          <button type="button" pButton class="ui-button-warning" (click)="onRenew(item)" icon="fa-refresh" label="Renew"></button>
+        </ng-template>
+      </p-column>
+
+
       <p-footer *ngIf="selectedRecords != 0">
         <ul>
           <li *ngFor="let record of selectedRecords" style="list-style:none; text-align:left">{{record.Email}};</li>
@@ -205,6 +213,34 @@
     </div>
   </div>
 
+</p-dialog>
+
+<p-dialog header="Renew Subscription" [(visible)]="displayRenewDialog" [responsive]="true" showEffect="fade" [modal]="true"
+  [width]="450">
+  <form #renewForm="ngForm" (ngSubmit)="renewSubscription(renewForm.value)">
+    <div class="ui-g">
+      <div class="ui-grid-row" style="display: none">
+        <input type="text" [(ngModel)]="editSubscription.id" name="id" #id="ngModel" class="form-control" pInputText>
+        <input type="text" [(ngModel)]="editSubscription.employeeName" name="employeeName" #employeeName="ngModel" class="form-control" pInputText>
+      </div>
+      <p-panel [style]="{'margin-bottom':'20px'}" styleClass="editPanel" class="ui-g-12">
+        <div class="ui-grid-col-12 ui-grid-nopad" style="text-align:center">
+          <h4 >{{editSubscription.employeeName}}</h4>
+        </div>
+
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-4">Renewal Amount</label>
+          <p-selectButton [options]="amountOptions" [(ngModel)]="editSubscription.amount" name="amount" #amount="ngModel" class="form-control ui-grid-col-8 ui-g-nopad"></p-selectButton>
+        </div>
+        <div class="ui-g-12"></div>
+        <div class="ui-grid-row">
+          <label class="ui-grid-col-4">Comments</label>
+          <input type="text" [(ngModel)]="editSubscription.comments" name="comments" #comments="ngModel" class="form-control ui-grid-col-8" pInputText>
+        </div>
+      </p-panel>
+      <button pButton label="Submit" type="submit" style="margin-left: 5px; margin-top:-20px"></button>
+    </div>
+  </form>
 </p-dialog>
 
 

@@ -66,6 +66,7 @@ export class AccountingService {
       Type: model.type,
       Amount: model.amount, //check if the amount should be assigned as +model.amount
       PaymentDate: new Date()
+   // PaymentDate: (model.paymentDate != null) ? model.paymentDate : new Date()
     });
   }
 
@@ -74,6 +75,7 @@ export class AccountingService {
       id: model.id,
       Name: model.employeeName,
       Phone: model.phone,
+      StartDate: model.startDate,
       Email: this.generateEmail(model.employeeName),
       Status: model.status,
       Comments: model.comments,

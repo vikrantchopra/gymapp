@@ -19,7 +19,8 @@ export class AccountManagementComponent implements OnInit {
   addAccount: Account;
 
   editSubscription: Subscription;
-  displayEditDialog:boolean;
+  displayEditDialog: boolean;
+  displayRenewDialog: boolean;
 
   selectedRecord: any;
   displayEmergencyDialog: boolean;
@@ -49,9 +50,9 @@ export class AccountManagementComponent implements OnInit {
     this.editSubscription = this.initializeAccount();
 
     this.getMemberCount();
-    this.getMonthlySubscriptions();
-    this.getQuarterlySubscriptions();
-    this.getActiveSubscriptions();
+    //this.getMonthlySubscriptions();
+    //this.getQuarterlySubscriptions();
+    //this.getActiveSubscriptions();
 
     this.getSubscriptionChartData();
     this.getStatusChartData();
@@ -194,6 +195,21 @@ export class AccountManagementComponent implements OnInit {
   onEditRow(item: any) {
     this.editSubscription = this.cloneSubscripition(item);
     this.displayEditDialog = true;
+  }
+
+  onRenew(item: any) {
+    this.editSubscription = this.cloneSubscripition(item);
+    this.displayRenewDialog = true;
+  }
+
+  renewSubscription(model: any) {
+    model.type = "Credit";
+    model.startDate = new Date();
+    this.accountingService.update(model);
+    this.accountingService.saveTransaction(model);
+
+    this.displayRenewDialog = false;
+    this.editSubscription = this.initializeAccount();
   }
 
   cloneSubscripition(item: any) {
